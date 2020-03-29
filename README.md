@@ -1,0 +1,3 @@
+# Trivially
+
+Trivia app :)
