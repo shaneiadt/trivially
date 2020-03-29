@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Trivally</title>
+    <link rel="icon" href="/img/favicon.png" />
+    <link rel="stylesheet" href="/css/styles.css" />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bulma@0.8.0/css/bulma.min.css"
+    />
+    <script
+      defer
+      src="https://use.fontawesome.com/releases/v5.3.1/js/all.js"
+    ></script>
+  </head>
+
+  <body style="height: 100%;">
+    <div
+      class="columns is-flex"
+      style="align-items:stretch;height:100%;margin:0;"
+    >
+      <div class="column has-background-primary">
+        <div id="sidebar" class="has-text-white"></div>
+      </div>
+      <div class="column has-background-light is-four-fifths">
+        <div id="question" class="box is-hidden"></div>
+
+        <div id="answers">
+        </div>
+
+        <div id="user-controls">
+          <div class="control">
+            <button id="lock-in-answer" class="button is-primary is-outlined" style="width: 100%;">
+              Lock in answer
+            </button>
+          </div>
+        </div>
+
+        <div
+          id="admin-controls"
+          class="box is-inline-block"
+          style="position:absolute;bottom:15px;right:15px;"
+        >
+          <div class="control">
+            <button class="button is-primary generate-quiz">
+              New Quiz
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script id="question-template" type="text/html">
+      <h1 class="title">Round {{round}}</h1>
+      <p>{{question}}</p>
+    </script>
+
+    <script id="answers-template" type="text/html">
+      {{#.}}
+        <div class="box">
+          <div class="control">
+            <label class="radio">
+              <input type="radio" name="{{.}}" />
+              {{.}}
+            </label>
+          </div>
+        </div>
+      {{/.}}
+    </script>
+
+    <script id="sidebar-template" type="text/html">
+      <h3 class="list-title">Teams</h3>
+      <ul class="users">
+          {{#teams}}
+          <li>{{name}} - {{score}}</li>
+          {{/teams}}
+      </ul>
+    </script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mustache.js/3.0.1/mustache.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.22.2/moment.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qs/6.6.0/qs.min.js"></script>
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="/js/quiz.js"></script>
+  </body>
+</html>
