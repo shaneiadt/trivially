@@ -16,11 +16,8 @@ const io = require("socket.io")(server);
 
 const port = process.env.PORT;
 
-// const publicFolder = path.join(__dirname, "./app/dist");
-// app.use(express.static(publicFolder));
-
 io.on("connection", socket => {
-  console.log(socket);
+  console.log("NEW CONECTION",socket.id);
   socket.on("message", (msg, cb) => {
     const team = getTeam(socket.id);
 

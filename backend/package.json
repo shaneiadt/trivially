@@ -6,7 +6,7 @@
   "scripts": {
     "start": "node ./src/server.js",
     "dev:backend": "npx env-cmd -f ./config/dev.env nodemon -L ./src/server.js",
-    "dev:frontend": "cd ./src/app && npm run serve",
+    "dev:frontend": "cd ../frontend && npm run serve",
     "dev": "concurrently npm:dev:*"
   },
   "keywords": [],
