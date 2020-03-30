@@ -11,6 +11,7 @@
                 class="input"
                 v-model="username"
                 type="text"
+                @keypress.enter="createUser(username)"
                 placeholder="Enter user name"
               />
             </div>

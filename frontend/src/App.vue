@@ -1,7 +1,7 @@
 <template>
   <div id="app">
     <Login v-if="display === 'LOGIN'" :createUser="createUser" />
-    <Rooms v-if="display === 'ROOMS'" />
+    <Rooms v-if="display === 'ROOMS'" :username="user.name" />
   </div>
 </template>
 
