@@ -1,32 +1,34 @@
 <template>
   <div id="app">
-    <div id="nav">
-      <router-link to="/">Home</router-link> |
-      <router-link to="/about">About</router-link>
-    </div>
-    <router-view />
+    <Login v-if="display === 'LOGIN'" :createUser="createUser" />
+    <Rooms v-if="display === 'ROOMS'" />
   </div>
 </template>
 
-<style>
-#app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-}
+<script lang="ts">
+import { Vue, Component } from "vue-property-decorator";
 
-#nav {
-  padding: 30px;
-}
+import { User } from "./types";
+import { Display } from "./enums";
 
-#nav a {
-  font-weight: bold;
-  color: #2c3e50;
-}
+import Login from "@/components/Login.vue";
+import Rooms from "@/components/Rooms.vue";
 
-#nav a.router-link-exact-active {
-  color: #42b983;
+@Component({
+  components: { Login, Rooms }
+})
+export default class Home extends Vue {
+  user: User | null = null;
+  display: Display = Display.LOGIN;
+
+  createUser(username: string): void {
+    this.user = new User(username);
+    this.display = Display.ROOMS;
+  }
+
+  // @Inject("socket") readonly socket: SocketIOClient.Socket;
+  // created(): void {
+  //   console.log(this.socket);
+  // }
 }
-</style>
+</script>
