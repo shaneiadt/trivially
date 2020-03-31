@@ -8,6 +8,7 @@
           <div class="field has-addons">
             <div class="control is-expanded">
               <input
+                ref="loginInput"
                 class="input"
                 v-model="username"
                 type="text"
@@ -33,12 +34,18 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop } from "vue-property-decorator";
+import { Vue, Component, Prop, Ref } from "vue-property-decorator";
 
 @Component
 export default class Login extends Vue {
   private username = "";
 
   @Prop() createUser!: Function;
+  @Ref() readonly loginInput!: HTMLInputElement;
+
+  mounted(): void {
+    const input = this.$refs.loginInput as HTMLInputElement;
+    input.focus();
+  }
 }
 </script>

@@ -8,8 +8,20 @@
           <div class="content">
             <div v-if="database.rooms.length >= 1">
               <div v-for="room in database.rooms" :key="room.id">
-                <h4 class="title is-5">{{ room.name }}</h4>
-                <button class="button">Remove</button>
+                <h5 class="title is-5">{{ room.name }}</h5>
+                <p class="title is-6">Category: {{ room.quiz.category }}</p>
+                <p class="title is-6">
+                  No. Questions: {{ room.quiz.questions.length }}
+                </p>
+                <button
+                  class="button is-primary is-outlined"
+                  @click="startRoom(room.id)"
+                >
+                  Start</button
+                >&nbsp;
+                <button class="button" @click="removeQuizRoom(room.id)">
+                  Remove
+                </button>
                 <br />
                 <br />
               </div>
@@ -20,9 +32,9 @@
           </div>
         </article>
       </div>
-      <div class="tile is-parent is-8">
+      <div class="tile is-parent is-9">
         <article class="tile is-child box">
-          <p class="title">Main column</p>
+          <p class="title">Actions</p>
           <hr />
           <div class="content">
             <div>
@@ -95,6 +107,7 @@ interface Quiz {
 export default class Login extends Vue {
   @Prop() readonly username!: string;
   @Prop() readonly join!: (id: string) => void;
+  @Prop() readonly startRoom!: (id: string) => void;
 
   private newQuizRoomName = "";
   private quizRoomId = "";
@@ -152,6 +165,11 @@ export default class Login extends Vue {
             ]
           })
         );
+
+        this.database = {
+          username: this.username,
+          rooms: [newRoom]
+        };
       } else {
         const parsed: { databases: Database[] } | undefined = JSON.parse(strDb);
 
@@ -182,6 +200,31 @@ export default class Login extends Vue {
         }
       }
     });
+  }
+
+  removeQuizRoom(roomId: string): void {
+    if (this.database) {
+      const index = this.database.rooms.findIndex(room => room.id === roomId);
+      this.database.rooms.splice(index, 1);
+
+      const strDb = window.localStorage.getItem("trivially");
+
+      if (strDb) {
+        const json: { databases: Database[] } | undefined = JSON.parse(strDb);
+
+        if (json) {
+          const userDb = json.databases.find(
+            db => db.username === this.username
+          );
+
+          if (userDb) {
+            userDb.rooms.splice(index, 1);
+            const saveStr = JSON.stringify(json);
+            window.localStorage.setItem("trivially", saveStr);
+          }
+        }
+      }
+    }
   }
 
   async generateQuiz(): Promise<Quiz> {
