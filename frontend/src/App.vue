@@ -1,7 +1,7 @@
 <template>
   <div id="app">
     <Login v-if="display === 'LOGIN'" :createUser="createUser" />
-    <Rooms v-if="display === 'ROOMS'" :username="user.name" />
+    <Rooms v-if="display === 'ROOMS'" :username="user.name" :join="join" />
   </div>
 </template>
 
@@ -24,6 +24,10 @@ export default class Home extends Vue {
   createUser(username: string): void {
     this.user = new User(username);
     this.display = Display.ROOMS;
+  }
+
+  join(quizRoomId: string): void {
+    console.log("JOIN", quizRoomId);
   }
 
   // @Inject("socket") readonly socket: SocketIOClient.Socket;

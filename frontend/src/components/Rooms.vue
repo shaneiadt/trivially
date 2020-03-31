@@ -46,9 +46,9 @@
               <input
                 class="input"
                 type="text"
-                v-model="newQuizRoomName"
-                placeholder="New Quiz Room"
-                @keypress.enter="createDatabase(newQuizRoomName)"
+                v-model="quizRoomId"
+                placeholder="Enter Quiz Room ID"
+                @keypress.enter="join(quizRoomId)"
               />
               <br />
               <br />
@@ -94,8 +94,10 @@ interface Quiz {
 @Component
 export default class Login extends Vue {
   @Prop() readonly username!: string;
+  @Prop() readonly join!: (id: string) => void;
 
   private newQuizRoomName = "";
+  private quizRoomId = "";
   database: Database | null = null;
 
   private api = `https://opentdb.com/api.php?amount=10&category=9&type=multiple`;
