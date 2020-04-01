@@ -1,0 +1,23 @@
+{
+  "name": "trivially",
+  "version": "1.0.0",
+  "description": "Trivia app :)",
+  "main": "index.js",
+  "scripts": {
+    "dev:backend": "cd ./backend && npm run dev",
+    "dev:frontend": "cd ./frontend && npm run serve",
+    "dev": "npx concurrently npm:dev:*"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/shaneiadt/trivially.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/shaneiadt/trivially/issues"
+  },
+  "homepage": "https://github.com/shaneiadt/trivially#readme",
+  "dependencies": {}
+}
