@@ -8,7 +8,7 @@ const {
   getTeam,
   getTeamsInRoom
 } = require("./utils/teams");
-const { generateQuiz, getQuiz } = require("./utils/quiz");
+const { getQuizBySid, getQuizById, newQuiz } = require("./utils/quiz");
 
 const app = express();
 const server = http.createServer(app);
@@ -17,7 +17,29 @@ const io = require("socket.io")(server);
 const port = process.env.PORT;
 
 io.on("connection", socket => {
-  console.log("NEW CONECTION",socket.id);
+  // console.log("NEW CONECTION", socket.id);
+
+  socket.on("newQuiz", quiz => {
+    newQuiz({ ...quiz, sid: socket.id });
+
+    const q = getQuizById(socket.id)[0];
+
+    if (q) io.to(socket.id).emit("roomData", q);
+  });
+
+  socket.on("join", (sid, cb) => {
+    console.log('SID / QID', sid);
+    const q = getQuizById(sid)[0];
+    console.log(q);
+
+    if (!q) {
+      return cb(null);
+    } else {
+      io.to(socket.id).emit("roomData", q);
+    };
+
+  });
+
   socket.on("message", (msg, cb) => {
     const team = getTeam(socket.id);
 
@@ -27,38 +49,27 @@ io.on("connection", socket => {
     cb("delievered");
   });
 
-  socket.on("generateQuiz", async () => {
-    const quiz = await generateQuiz();
-    const team = getTeam(socket.id);
+  // socket.on("join", ({ name, room }, cb) => {
+  //   const { error, team } = addTeam({
+  //     id: socket.id,
+  //     name,
+  //     room
+  //   });
 
-    io.to(team.room).emit("roomData", {
-        room: team.room,
-        teams: getTeamsInRoom(team.room),
-        quiz
-      });
-  });
+  //   if (error) return cb(error);
 
-  socket.on("join", ({ name, room }, cb) => {
-    const { error, team } = addTeam({
-      id: socket.id,
-      name,
-      room
-    });
+  //   socket.join(team.room);
+  //   // socket.emit("message", generateMessage("Admin", "Welcome"));
+  //   socket.broadcast.to(team.room).emit("message", `${team.name} has joined!`);
 
-    if (error) return cb(error);
+  //   io.to(team.room).emit("roomData", {
+  //     room: team.room,
+  //     teams: getTeamsInRoom(team.room),
+  //     quiz: getQuiz()
+  //   });
 
-    socket.join(team.room);
-    // socket.emit("message", generateMessage("Admin", "Welcome"));
-    socket.broadcast.to(team.room).emit("message", `${team.name} has joined!`);
-
-    io.to(team.room).emit("roomData", {
-      room: team.room,
-      teams: getTeamsInRoom(team.room),
-      quiz: getQuiz()
-    });
-
-    cb();
-  });
+  //   cb();
+  // });
 
   socket.on("disconnect", () => {
     const team = removeTeam(socket.id);

@@ -1,34 +1,18 @@
-const axios = require("axios").default;
+let quiz = [];
 
-const api = `https://opentdb.com/api.php?amount=10&category=9&type=multiple`;
-let quiz = null;
+const getQuizById = (id) => quiz.filter(q => q.sid === id || q.id === id);
 
-const generateQuiz = async () => {
-  try {
-    const response = await axios.get(api);
-    const category = response.data.results[0]["category"];
-    const questions = response.data.results.map(obj => ({
-      question: obj.question,
-      difficulty: obj.difficulty,
-      answers: [...obj.incorrect_answers, obj.correct_answer],
-      correct_answer: obj.correct_answer
-    }));
+const getQuizByQid = (qid) => quiz.filter(q => q.id === qid);
 
-    quiz = {
-      category,
-      curentQuestionIndex: 0,
-      questions
-    };
-
-    return quiz;
-  } catch (error) {
-    throw new Error(error);
-  }
+const newQuiz = (newQuizObj) => {
+  quiz = [
+    ...quiz,
+    newQuizObj
+  ]
 };
 
-const getQuiz = () => quiz;
-
 module.exports = {
-  generateQuiz,
-  getQuiz
+  getQuizById,
+  getQuizByQid,
+  newQuiz
 };

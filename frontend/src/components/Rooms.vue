@@ -10,25 +10,14 @@
               <div v-for="room in database.rooms" :key="room.id">
                 <h5 class="title is-5">{{ room.name }}</h5>
                 <p class="title is-6">Category: {{ room.quiz.category }}</p>
-                <p class="title is-6">
-                  No. Questions: {{ room.quiz.questions.length }}
-                </p>
-                <button
-                  class="button is-primary is-outlined"
-                  @click="startRoom(room.id)"
-                >
-                  Start</button
-                >&nbsp;
-                <button class="button" @click="removeQuizRoom(room.id)">
-                  Remove
-                </button>
+                <p class="title is-6">No. Questions: {{ room.quiz.questions.length }}</p>
+                <button class="button is-primary is-outlined" @click="startRoom(room.id)">Start</button>&nbsp;
+                <button class="button" @click="removeQuizRoom(room.id)">Remove</button>
                 <br />
                 <br />
               </div>
             </div>
-            <div v-else>
-              No Quiz Rooms :(
-            </div>
+            <div v-else>No Quiz Rooms :(</div>
           </div>
         </article>
       </div>
@@ -50,9 +39,7 @@
               <button
                 class="button is-fullwidth is-primary is-outlined"
                 @click="createDatabase(newQuizRoomName)"
-              >
-                Create
-              </button>
+              >Create</button>
               <br />
               <br />
               <input
@@ -64,9 +51,7 @@
               />
               <br />
               <br />
-              <button class="button is-fullwidth is-primary is-outlined">
-                Join
-              </button>
+              <button class="button is-fullwidth is-primary is-outlined">Join</button>
             </div>
           </div>
         </article>
@@ -77,14 +62,15 @@
 
 <script lang="ts">
 import { Vue, Component, Prop } from "vue-property-decorator";
+import { Room } from '../interfaces';
 import { v4 as uuidv4 } from "uuid";
 import axios from "axios";
 
-interface Room {
-  id: string;
-  name: string;
-  quiz: Quiz;
-}
+// interface Room {
+//   id: string;
+//   name: string;
+//   quiz: Quiz;
+// }
 
 interface Database {
   username: string;
@@ -117,7 +103,6 @@ export default class Login extends Vue {
 
   created(): void {
     this.database = this.getDatabase(this.username);
-    console.log(this.database);
   }
 
   getDatabase(username: string): Database {
@@ -132,6 +117,8 @@ export default class Login extends Vue {
     const parsed: { databases: Database[] } | undefined = JSON.parse(strDb);
 
     if (!parsed) return database;
+
+    if (!parsed.databases) return database;
 
     const userDatabase = parsed.databases.find(
       database => database.username === username
@@ -149,7 +136,11 @@ export default class Login extends Vue {
       const newRoom: Room = {
         name: roomName,
         id: uuidv4(),
-        quiz
+        quiz,
+        admin: [{
+          name: this.username
+        }],
+        players: []
       };
       const strDb: string | null = window.localStorage.getItem("trivially");
 

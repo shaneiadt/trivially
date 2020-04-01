@@ -36,6 +36,8 @@ export default class Home extends Vue {
 
   join(roomId: string): void {
     console.log("JOIN", roomId);
+    this.qid = roomId;
+    this.display = Display.QUIZ;
   }
 
   startRoom(roomId: string): void {
