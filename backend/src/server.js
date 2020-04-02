@@ -8,7 +8,7 @@ const {
   getTeam,
   getTeamsInRoom
 } = require("./utils/teams");
-const { getQuizBySid, getQuizById, newQuiz } = require("./utils/quiz");
+const { getQuizById, newQuiz } = require("./utils/quiz");
 
 const app = express();
 const server = http.createServer(app);
@@ -17,24 +17,27 @@ const io = require("socket.io")(server);
 const port = process.env.PORT;
 
 io.on("connection", socket => {
-  // console.log("NEW CONECTION", socket.id);
 
   socket.on("newQuiz", quiz => {
     newQuiz({ ...quiz, sid: socket.id });
 
-    const q = getQuizById(socket.id)[0];
+    const q = getQuizById(socket.id);
 
     if (q) io.to(socket.id).emit("roomData", q);
   });
 
-  socket.on("join", (sid, cb) => {
-    console.log('SID / QID', sid);
-    const q = getQuizById(sid)[0];
+  socket.on("join", (id, cb) => {
+    console.log('socket.id / id', id);
+    const q = getQuizById(id);
     console.log(q);
 
     if (!q) {
       return cb(null);
     } else {
+
+      
+
+      socket.join(socket.id);
       io.to(socket.id).emit("roomData", q);
     };
 

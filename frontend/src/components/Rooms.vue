@@ -11,7 +11,7 @@
                 <h5 class="title is-5">{{ room.name }}</h5>
                 <p class="title is-6">Category: {{ room.quiz.category }}</p>
                 <p class="title is-6">No. Questions: {{ room.quiz.questions.length }}</p>
-                <button class="button is-primary is-outlined" @click="startRoom(room.id)">Start</button>&nbsp;
+                <button class="button is-primary is-outlined" @click="join(room.id)">Start</button>&nbsp;
                 <button class="button" @click="removeQuizRoom(room.id)">Remove</button>
                 <br />
                 <br />
@@ -93,7 +93,6 @@ interface Quiz {
 export default class Login extends Vue {
   @Prop() readonly username!: string;
   @Prop() readonly join!: (id: string) => void;
-  @Prop() readonly startRoom!: (id: string) => void;
 
   private newQuizRoomName = "";
   private quizRoomId = "";
@@ -137,10 +136,14 @@ export default class Login extends Vue {
         name: roomName,
         id: uuidv4(),
         quiz,
-        admin: [{
-          name: this.username
-        }],
-        players: []
+        admin: [this.username],
+        players: [
+          {
+            name: this.username,
+            score: 0,
+            answers: []
+          }
+        ]
       };
       const strDb: string | null = window.localStorage.getItem("trivially");
 

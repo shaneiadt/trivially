@@ -7,7 +7,7 @@
       :join="join"
       :startRoom="startRoom"
     />
-    <Quiz v-if="display === 'QUIZ'" :qid="qid" />
+    <Quiz v-if="display === 'QUIZ'" :qid="qid" :username="user.name" />
   </div>
 </template>
 
@@ -39,16 +39,5 @@ export default class Home extends Vue {
     this.qid = roomId;
     this.display = Display.QUIZ;
   }
-
-  startRoom(roomId: string): void {
-    console.log("START", roomId);
-    this.qid = roomId;
-    this.display = Display.QUIZ;
-  }
-
-  // @Inject("socket") readonly socket: SocketIOClient.Socket;
-  // created(): void {
-  //   console.log(this.socket);
-  // }
 }
 </script>

@@ -2,8 +2,14 @@ export interface Room {
   id: string;
   name: string;
   quiz: Quiz;
-  admin: User[];
-  players: User[];
+  admin: string[];
+  players: Player[];
+}
+
+export interface Player {
+  name: string;
+  score: number;
+  answers: number[];
 }
 
 export interface Database {
@@ -25,5 +31,5 @@ export interface Quiz {
 
 export interface User {
   name: string;
-  // rooms: { id: string; users: User[] }[];
+
 }

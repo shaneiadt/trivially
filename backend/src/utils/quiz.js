@@ -1,8 +1,6 @@
 let quiz = [];
 
-const getQuizById = (id) => quiz.filter(q => q.sid === id || q.id === id);
-
-const getQuizByQid = (qid) => quiz.filter(q => q.id === qid);
+const getQuizById = (id) => quiz.find(q => q.sid === id || q.id === id);
 
 const newQuiz = (newQuizObj) => {
   quiz = [
@@ -11,8 +9,13 @@ const newQuiz = (newQuizObj) => {
   ]
 };
 
+const addPlayer = (id, username) => {
+  const q = getQuizById(id);
+  console.log('ADD PLAYER', username);
+  console.log(q);
+};
+
 module.exports = {
   getQuizById,
-  getQuizByQid,
   newQuiz
 };
