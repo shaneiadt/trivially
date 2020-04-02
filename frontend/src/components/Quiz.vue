@@ -8,10 +8,12 @@
           <hr />
           <div class="content">
             <ul>
-              <li
-                v-for="player in room.players"
-                :key="player.name"
-              >{{ player.name }} - {{ player.score }}</li>
+              <li v-for="player in room.players" :key="player.name">
+                {{ player.name }}
+                <span class="icon" v-if="room.quiz.isStarted">
+                  <i v-if="room.players.find(p => p.name === player.name).answers[room.quiz.currentQuestionIndex] !== undefined" class="fas fa-lock"></i>
+                </span>
+              </li>
             </ul>
           </div>
         </article>
@@ -31,14 +33,24 @@
               class="subtitle is-5"
             >Difficulty: {{ room.quiz.questions[room.quiz.currentQuestionIndex]['difficulty'] }}</p>
 
-            <div class="box" v-for="(answer, index) in room.quiz.questions[room.quiz.currentQuestionIndex].answers" :key="index">
+            <div
+              class="box"
+              v-for="(answer, index) in room.quiz.questions[room.quiz.currentQuestionIndex].answers"
+              :key="index"
+            >
               <div class="control">
                 <label class="radio">
-                  <input type="radio" name="answer" :value="index" />
+                  <input type="radio" name="answer" :value="index" @click="setAnswer(index)" />
                   {{ answer }}
                 </label>
               </div>
             </div>
+
+            <button
+              :class="['button','is-fullwidth','is-primary']"
+              :disabled="answerIndex === -1"
+              @click="lockItIn"
+            >Lock It In!</button>
           </div>
           <div class="content" v-else>
             <p class="is-centered">WAITING ON QUIZ TO CLICK START</p>
@@ -49,6 +61,12 @@
               :class="['button','is-primary']"
               @click="startQuiz"
             >Start Quiz</button>
+            <button
+              v-if="room.quiz.isStarted && room.quiz.currentQuestionIndex + 1 < room.quiz.questions.length"
+              :class="['button','is-primary']"
+              @click="nextQuestion"
+              :disabled="!room.quiz.isStarted"
+            >Next Question</button>
           </div>
         </article>
       </div>
@@ -57,7 +75,7 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop } from "vue-property-decorator";
+import { Vue, Component, Prop, PropSync } from "vue-property-decorator";
 import {
   Database as UserDatabase,
   Room,
@@ -85,6 +103,7 @@ export default class Quiz extends Vue {
   userDb: UserDatabase | null = null;
   room: RoomData | null = null;
   socket: SocketIOClient.Socket = io("http://localhost:3333");
+  answerIndex = -1;
 
   mounted(): void {
     this.socket.emit(
@@ -122,10 +141,48 @@ export default class Quiz extends Vue {
     });
   }
 
+  setAnswer(index: number): void {
+    this.answerIndex = index;
+  }
+
+  lockItIn(): void {
+    console.log("LOCKING IT IN");
+    console.log({ index: this.answerIndex });
+
+    this.socket.emit("lockInAnswer", {
+      id: this.qid,
+      username: this.username,
+      answerIndex: this.answerIndex
+    });
+  }
+
+  isLockedIn(uname: string): boolean {
+    console.log('IsLocked In');
+    if (this.room) {
+      console.log(this.room);
+      const player = this.room.players.find(player => player.name === uname);
+
+      console.log(player);
+      if (player) {
+        return player.answers[this.room.quiz.currentQuestionIndex]
+          ? true
+          : false;
+      }
+    }
+
+    return false;
+  }
+
   startQuiz(): void {
     console.log("START QUIZ");
 
     this.socket.emit("startQuiz", { id: this.qid });
+  }
+
+  nextQuestion(): void {
+    console.log("NEXT QUESTION");
+
+    this.socket.emit("nextQuestion", { id: this.qid });
   }
 }
 </script>

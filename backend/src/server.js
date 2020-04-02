@@ -1,7 +1,7 @@
 const http = require("http");
 const express = require("express");
 
-const { getQuizById, newQuiz, addPlayer, removePlayer, startQuiz } = require("./utils/quiz");
+const { getQuizById, newQuiz, addPlayer, removePlayer, startQuiz, nextQuestion, lockInAnswer } = require("./utils/quiz");
 
 const app = express();
 const server = http.createServer(app);
@@ -21,6 +21,25 @@ io.on("connection", socket => {
       const qq = getQuizById(socket.id);
       io.to(socket.id).emit("roomData", qq);
     }
+  });
+
+  socket.on("nextQuestion", ({ id }) => {
+    const sid = nextQuestion(id);
+
+    if (sid) {
+      const quiz = getQuizById(sid);
+      io.to(sid).emit("roomData", quiz);
+    }
+  });
+
+  socket.on("lockInAnswer", ({ id, username, answerIndex }) => {
+    console.log('lockInAnswer', id, username, answerIndex);
+    const sid = lockInAnswer(id, username, answerIndex);
+    console.log({sid});
+    const quiz = getQuizById(sid);
+    console.log({quiz});
+
+    if (quiz) io.to(sid).emit("roomData", quiz);
   });
 
   socket.on("startQuiz", ({ id }) => {

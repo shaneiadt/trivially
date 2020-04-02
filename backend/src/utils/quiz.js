@@ -2,6 +2,8 @@ let quiz = [];
 
 const getQuizById = (id) => quiz.find(q => q.sid === id || q.id === id);
 
+const getQuizIndex = (id) => quiz.findIndex(q => q.sid === id || q.id === id);
+
 const startQuiz = (id) => {
   const room = getQuizById(id);
 
@@ -17,6 +19,31 @@ const newQuiz = (newQuizObj) => {
       ...quiz,
       newQuizObj
     ]
+  }
+};
+
+const lockInAnswer = (id, username, answerIndex) => {
+  console.log('HERE');
+  console.log({id, username, answerIndex});
+  const room = getQuizById(id);
+  console.log({room});
+
+  if (room) {
+    const player = room.players.find(player => player.name === username);
+    player.answers[room.quiz.currentQuestionIndex] = answerIndex;
+    return room.sid;
+  }
+};
+
+const nextQuestion = (id) => {
+  const room = getQuizById(id);
+
+  if (room) {
+    const index = getQuizIndex(id);
+
+    quiz[index].quiz.currentQuestionIndex += 1;
+
+    return room.sid;
   }
 };
 
@@ -72,5 +99,7 @@ module.exports = {
   newQuiz,
   addPlayer,
   removePlayer,
-  startQuiz
+  startQuiz,
+  nextQuestion,
+  lockInAnswer
 };
