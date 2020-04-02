@@ -9,6 +9,7 @@ export interface Room {
 export interface Player {
   name: string;
   score: number;
+  socketId: string;
   answers: number[];
 }
 
@@ -27,6 +28,8 @@ export interface Question {
 export interface Quiz {
   category: string;
   questions: Question[];
+  currentQuestionIndex: number;
+  isStarted: boolean;
 }
 
 export interface User {

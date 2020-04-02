@@ -51,7 +51,7 @@
               />
               <br />
               <br />
-              <button class="button is-fullwidth is-primary is-outlined">Join</button>
+              <button class="button is-fullwidth is-primary is-outlined" @click="join(quizRoomId)">Join</button>
             </div>
           </div>
         </article>
@@ -62,7 +62,7 @@
 
 <script lang="ts">
 import { Vue, Component, Prop } from "vue-property-decorator";
-import { Room } from '../interfaces';
+import { Room, Quiz } from '../interfaces';
 import { v4 as uuidv4 } from "uuid";
 import axios from "axios";
 
@@ -84,10 +84,10 @@ interface Question {
   correctAnswer: string;
 }
 
-interface Quiz {
-  category: string;
-  questions: Question[];
-}
+// interface Quiz {
+//   category: string;
+//   questions: Question[];
+// }
 
 @Component
 export default class Login extends Vue {
@@ -137,13 +137,7 @@ export default class Login extends Vue {
         id: uuidv4(),
         quiz,
         admin: [this.username],
-        players: [
-          {
-            name: this.username,
-            score: 0,
-            answers: []
-          }
-        ]
+        players: []
       };
       const strDb: string | null = window.localStorage.getItem("trivially");
 
@@ -241,7 +235,9 @@ export default class Login extends Vue {
 
       const quiz = {
         category,
-        questions
+        questions,
+        currentQuestionIndex: 0,
+        isStarted: false
       };
 
       return quiz;

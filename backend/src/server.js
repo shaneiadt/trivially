@@ -1,14 +1,7 @@
-const path = require("path");
 const http = require("http");
 const express = require("express");
 
-const {
-  addTeam,
-  removeTeam,
-  getTeam,
-  getTeamsInRoom
-} = require("./utils/teams");
-const { getQuizById, newQuiz } = require("./utils/quiz");
+const { getQuizById, newQuiz, addPlayer, removePlayer, startQuiz } = require("./utils/quiz");
 
 const app = express();
 const server = http.createServer(app);
@@ -18,74 +11,48 @@ const port = process.env.PORT;
 
 io.on("connection", socket => {
 
-  socket.on("newQuiz", quiz => {
-    newQuiz({ ...quiz, sid: socket.id });
+  socket.on("newQuiz", ({ quiz, username }) => {
+    newQuiz({ ...quiz, sid: socket.id }, username);
 
     const q = getQuizById(socket.id);
 
-    if (q) io.to(socket.id).emit("roomData", q);
+    if (q) {
+      addPlayer(q.id, username, socket.id);
+      const qq = getQuizById(socket.id);
+      io.to(socket.id).emit("roomData", qq);
+    }
   });
 
-  socket.on("join", (id, cb) => {
-    console.log('socket.id / id', id);
+  socket.on("startQuiz", ({ id }) => {
+    const sid = startQuiz(id);
     const q = getQuizById(id);
-    console.log(q);
+    io.to(sid).emit("roomData", q);
+  });
+
+  socket.on("join", ({ id, username }, cb) => {
+    const q = getQuizById(id);
 
     if (!q) {
       return cb(null);
     } else {
+      addPlayer(id, username, socket.id);
 
-      
+      const q = getQuizById(id);
+      // socket.broadcast.to(team.room).emit("message", `${team.name} has joined!`);
 
-      socket.join(socket.id);
-      io.to(socket.id).emit("roomData", q);
+      socket.join(q.sid);
+      io.to(q.sid).emit("roomData", q);
     };
 
   });
 
-  socket.on("message", (msg, cb) => {
-    const team = getTeam(socket.id);
-
-    if (!team) return cb({ error: "Cannot find team" });
-
-    io.to(team.room).emit("message", { team });
-    cb("delievered");
-  });
-
-  // socket.on("join", ({ name, room }, cb) => {
-  //   const { error, team } = addTeam({
-  //     id: socket.id,
-  //     name,
-  //     room
-  //   });
-
-  //   if (error) return cb(error);
-
-  //   socket.join(team.room);
-  //   // socket.emit("message", generateMessage("Admin", "Welcome"));
-  //   socket.broadcast.to(team.room).emit("message", `${team.name} has joined!`);
-
-  //   io.to(team.room).emit("roomData", {
-  //     room: team.room,
-  //     teams: getTeamsInRoom(team.room),
-  //     quiz: getQuiz()
-  //   });
-
-  //   cb();
-  // });
-
   socket.on("disconnect", () => {
-    const team = removeTeam(socket.id);
-
-    if (!team) return;
-
-    socket.broadcast.to(team.room).emit("message", `${team.name} has left.`);
-
-    io.to(team.room).emit("roomData", {
-      room: team.room,
-      teams: getTeamsInRoom(team.room),
-      quiz: getQuiz()
-    });
+    const sid = removePlayer(socket.id);
+    // socket.broadcast.to(team.room).emit("message", `${team.name} has left.`);
+    if (sid) {
+      const q = getQuizById(sid);
+      io.to(sid).emit("roomData", q);
+    }
   });
 });
 

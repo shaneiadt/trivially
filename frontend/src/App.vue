@@ -5,7 +5,6 @@
       v-if="display === 'ROOMS'"
       :username="user.name"
       :join="join"
-      :startRoom="startRoom"
     />
     <Quiz v-if="display === 'QUIZ'" :qid="qid" :username="user.name" />
   </div>
