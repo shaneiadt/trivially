@@ -4,14 +4,23 @@
       <div class="tile is-parent">
         <article class="tile is-child box" v-if="room">
           <p class="title">Players</p>
-          <p class="subtitle has-text-weight-light" style="font-size:15px;">{{ room.id }}</p>
+          <p class="subtitle has-text-weight-light" style="font-size:15px;">
+            {{ room.id }}
+          </p>
           <hr />
           <div class="content">
             <ul>
               <li v-for="player in room.players" :key="player.name">
                 {{ player.name }}
                 <span class="icon" v-if="room.quiz.isStarted">
-                  <i v-if="room.players.find(p => p.name === player.name).answers[room.quiz.currentQuestionIndex] !== undefined" class="fas fa-lock"></i>
+                  <i
+                    v-if="
+                      room.players.find(p => p.name === player.name).answers[
+                        room.quiz.currentQuestionIndex
+                      ] !== undefined
+                    "
+                    class="fas fa-lock"
+                  ></i>
                 </span>
               </li>
             </ul>
@@ -20,37 +29,58 @@
       </div>
       <div class="tile is-parent is-9">
         <article class="tile is-child box" v-if="room">
-          <p
-            class="title"
-          >{{ room.name }}{{ room.quiz.isStarted ? ` - Round ${room.quiz.currentQuestionIndex + 1}` : "" }}</p>
+          <p class="title">
+            {{ room.name
+            }}{{
+              room.quiz.isStarted
+                ? ` - Round ${room.quiz.currentQuestionIndex + 1}`
+                : ""
+            }}
+          </p>
           <p class="subtitle">{{ room.quiz.category }}</p>
           <hr />
           <div class="content" v-if="room.quiz.isStarted">
-            <p
-              class="title is-3"
-            >{{ room.quiz.questions[room.quiz.currentQuestionIndex]['question'] }}</p>
-            <p
-              class="subtitle is-5"
-            >Difficulty: {{ room.quiz.questions[room.quiz.currentQuestionIndex]['difficulty'] }}</p>
+            <p class="title is-3">
+              {{
+                room.quiz.questions[room.quiz.currentQuestionIndex]["question"]
+              }}
+            </p>
+            <p class="subtitle is-5">
+              Difficulty:
+              {{
+                room.quiz.questions[room.quiz.currentQuestionIndex][
+                  "difficulty"
+                ]
+              }}
+            </p>
 
             <div
               class="box"
-              v-for="(answer, index) in room.quiz.questions[room.quiz.currentQuestionIndex].answers"
+              v-for="(answer, index) in room.quiz.questions[
+                room.quiz.currentQuestionIndex
+              ].answers"
               :key="index"
             >
               <div class="control">
                 <label class="radio">
-                  <input type="radio" name="answer" :value="index" @click="setAnswer(index)" />
+                  <input
+                    type="radio"
+                    name="answer"
+                    :value="index"
+                    @click="setAnswer(index)"
+                  />
                   {{ answer }}
                 </label>
               </div>
             </div>
 
             <button
-              :class="['button','is-fullwidth','is-primary']"
+              :class="['button', 'is-fullwidth', 'is-primary']"
               :disabled="answerIndex === -1"
               @click="lockItIn"
-            >Lock It In!</button>
+            >
+              Lock It In!
+            </button>
           </div>
           <div class="content" v-else>
             <p class="is-centered">WAITING ON QUIZ TO CLICK START</p>
@@ -58,15 +88,23 @@
           <div v-if="room.admin.includes(username)">
             <button
               v-if="!room.quiz.isStarted"
-              :class="['button','is-primary']"
+              :class="['button', 'is-primary']"
               @click="startQuiz"
-            >Start Quiz</button>
+            >
+              Start Quiz
+            </button>
             <button
-              v-if="room.quiz.isStarted && room.quiz.currentQuestionIndex + 1 < room.quiz.questions.length"
-              :class="['button','is-primary']"
+              v-if="
+                room.quiz.isStarted &&
+                  room.quiz.currentQuestionIndex + 1 <
+                    room.quiz.questions.length
+              "
+              :class="['button', 'is-primary']"
               @click="nextQuestion"
               :disabled="!room.quiz.isStarted"
-            >Next Question</button>
+            >
+              Next Question
+            </button>
           </div>
         </article>
       </div>
@@ -75,14 +113,14 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop, PropSync } from "vue-property-decorator";
+import { Vue, Component, Prop } from "vue-property-decorator";
 import {
   Database as UserDatabase,
-  Room,
+  // Room,
   Quiz as RDQuiz,
   Player
 } from "../interfaces";
-import { Database, User } from "../types";
+import { Database } from "../types";
 import io from "socket.io-client";
 
 interface RoomData {
@@ -157,7 +195,7 @@ export default class Quiz extends Vue {
   }
 
   isLockedIn(uname: string): boolean {
-    console.log('IsLocked In');
+    console.log("IsLocked In");
     if (this.room) {
       console.log(this.room);
       const player = this.room.players.find(player => player.name === uname);

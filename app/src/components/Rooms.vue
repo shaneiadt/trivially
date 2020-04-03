@@ -10,9 +10,18 @@
               <div v-for="room in database.rooms" :key="room.id">
                 <h5 class="title is-5">{{ room.name }}</h5>
                 <p class="title is-6">Category: {{ room.quiz.category }}</p>
-                <p class="title is-6">No. Questions: {{ room.quiz.questions.length }}</p>
-                <button class="button is-primary is-outlined" @click="join(room.id)">Start</button>&nbsp;
-                <button class="button" @click="removeQuizRoom(room.id)">Remove</button>
+                <p class="title is-6">
+                  No. Questions: {{ room.quiz.questions.length }}
+                </p>
+                <button
+                  class="button is-primary is-outlined"
+                  @click="join(room.id)"
+                >
+                  Start</button
+                >&nbsp;
+                <button class="button" @click="removeQuizRoom(room.id)">
+                  Remove
+                </button>
                 <br />
                 <br />
               </div>
@@ -39,7 +48,9 @@
               <button
                 class="button is-fullwidth is-primary is-outlined"
                 @click="createDatabase(newQuizRoomName)"
-              >Create</button>
+              >
+                Create
+              </button>
               <br />
               <br />
               <input
@@ -51,7 +62,12 @@
               />
               <br />
               <br />
-              <button class="button is-fullwidth is-primary is-outlined" @click="join(quizRoomId)">Join</button>
+              <button
+                class="button is-fullwidth is-primary is-outlined"
+                @click="join(quizRoomId)"
+              >
+                Join
+              </button>
             </div>
           </div>
         </article>
@@ -62,7 +78,7 @@
 
 <script lang="ts">
 import { Vue, Component, Prop } from "vue-property-decorator";
-import { Room, Quiz } from '../interfaces';
+import { Room, Quiz } from "../interfaces";
 import { v4 as uuidv4 } from "uuid";
 import axios from "axios";
 
