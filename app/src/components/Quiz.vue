@@ -132,6 +132,8 @@ interface RoomData {
   players: Player[];
 }
 
+const HOST = process.env.VUE_APP_HOST ? `http://localhost:${process.env.VUE_APP_HOST}`  : "";
+
 @Component
 export default class Quiz extends Vue {
   @Prop() readonly qid!: string;
@@ -140,7 +142,7 @@ export default class Quiz extends Vue {
   database: Database = new Database("trivially");
   userDb: UserDatabase | null = null;
   room: RoomData | null = null;
-  socket: SocketIOClient.Socket = io("http://localhost:3333");
+  socket: SocketIOClient.Socket = io(HOST);
   answerIndex = -1;
 
   mounted(): void {
