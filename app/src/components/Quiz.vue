@@ -43,6 +43,9 @@
                   <span class="icon" v-for="index in scores[player.name]" :key="index">
                     <i class="fas fa-star"></i>
                   </span>
+                  <span class="icon" v-for="index in room.quiz.questions.length - scores[player.name]" :key="index">
+                    <i class="far fa-star"></i>
+                  </span>
                 </div>
               </div>
             </div>
@@ -52,12 +55,12 @@
               v-for="(question, index) in room.quiz.questions"
               :key="index + Math.random()"
             >
-              <p class="has-text-weight-semibold">{{index + 1}}. {{ question.question }}</p>
+              <p class="has-text-weight-semibold">{{index + 1}}. {{ question.question | decode }}</p>
               <p
                 :class="[answer === question.correctAnswer ? 'has-text-weight-bold':'has-text-weight-light']"
                 v-for="answer in question.answers"
                 :key="answer"
-              >{{ answer }}</p>
+              >{{ answer | decode }}</p>
             </div>
           </div>
           <div class="content" ref="answerContainer" v-if="room.quiz.isStarted && !showResults">
