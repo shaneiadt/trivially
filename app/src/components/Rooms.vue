@@ -66,7 +66,7 @@
                     <input class="input" type="text" v-model="amount" />
                   </div>
                   <div class="column">
-                    <input class="input" type="text" v-model="category" />
+                    <input class="input" type="text" v-model="categoryNumber" />
                   </div>
                 </div>
                 <button
@@ -138,7 +138,7 @@ export default class Login extends Vue {
   private quizRoomId = "";
   database: Database | null = null;
   private amount = 10;
-  private category = 9;
+  private categoryNumber = 9;
 
   created(): void {
     this.database = this.getDatabase(this.username);
@@ -258,7 +258,7 @@ export default class Login extends Vue {
   async generateQuiz(): Promise<Quiz> {
     try {
       const shuffle = () => Math.random() - 0.5;
-      const api = `https://opentdb.com/api.php?amount=${this.amount}&type=multiple&category=${this.category}&difficulty=easy`;
+      const api = `https://opentdb.com/api.php?amount=${this.amount}&type=multiple&category=${this.categoryNumber}&difficulty=easy`;
       const response = await axios.get(api);
       // const category = response.data.results[0]["category"];
       const category = "Any";
