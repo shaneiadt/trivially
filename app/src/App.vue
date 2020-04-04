@@ -1,12 +1,13 @@
 <template>
   <div id="app">
     <Login v-if="display === 'LOGIN'" :createUser="createUser" />
-    <Rooms
-      v-if="display === 'ROOMS'"
+    <Rooms v-if="display === 'ROOMS'" :username="user.name" :join="join" />
+    <Quiz
+      v-if="display === 'QUIZ'"
+      :qid="qid"
       :username="user.name"
-      :join="join"
+      :leave="leave"
     />
-    <Quiz v-if="display === 'QUIZ'" :qid="qid" :username="user.name" :leave="leave" />
   </div>
 </template>
 
@@ -38,7 +39,7 @@ export default class Home extends Vue {
     this.qid = roomId;
     this.display = Display.QUIZ;
   }
-  
+
   leave(): void {
     this.qid = "";
     this.display = Display.ROOMS;

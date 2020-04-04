@@ -10,9 +10,18 @@
               <div v-for="room in database.rooms" :key="room.id">
                 <h5 class="title is-5">{{ room.name }}</h5>
                 <p class="title is-6">Category: {{ room.quiz.category }}</p>
-                <p class="title is-6">No. Questions: {{ room.quiz.questions.length }}</p>
-                <button class="button is-primary is-outlined" @click="join(room.id)">Start</button>&nbsp;
-                <button class="button" @click="removeQuizRoom(room.id)">Remove</button>
+                <p class="title is-6">
+                  No. Questions: {{ room.quiz.questions.length }}
+                </p>
+                <button
+                  class="button is-primary is-outlined"
+                  @click="join(room.id)"
+                >
+                  Start</button
+                >&nbsp;
+                <button class="button" @click="removeQuizRoom(room.id)">
+                  Remove
+                </button>
                 <br />
                 <br />
               </div>
@@ -38,22 +47,31 @@
                 <button
                   class="button is-fullwidth is-primary is-outlined"
                   @click="join(quizRoomId)"
-                >Join</button>
+                >
+                  Join
+                </button>
               </div>
               <div class="column">
-                <input
-                  class="input"
-                  type="text"
-                  v-model="newQuizRoomName"
-                  placeholder="New Quiz Room"
-                  @keypress.enter="createDatabase(newQuizRoomName)"
-                />
-                <br />
-                <br />
+                <div class="columns">
+                  <div class="column is-four-fifths">
+                    <input
+                      class="input"
+                      type="text"
+                      v-model="newQuizRoomName"
+                      placeholder="New Quiz Room"
+                      @keypress.enter="createDatabase(newQuizRoomName)"
+                    />
+                  </div>
+                  <div class="column">
+                    <input class="input" type="text" v-model="amount" />
+                  </div>
+                </div>
                 <button
                   class="button is-fullwidth is-primary is-outlined"
                   @click="createDatabase(newQuizRoomName)"
-                >Create</button>
+                >
+                  Create
+                </button>
               </div>
             </div>
           </div>
@@ -92,6 +110,22 @@ interface Question {
 //   questions: Question[];
 // }
 
+// const CATEGORIES = [
+//   {
+//     value: 0,
+//     title: "Any"
+//   },
+//   {
+//     value: 9,
+//     title: "General Knowledge"
+//   }
+//   },
+//   {
+//     value: 9,
+//     title: "General Knowledge"
+//   }
+// ];
+
 @Component
 export default class Login extends Vue {
   @Prop() readonly username!: string;
@@ -100,8 +134,7 @@ export default class Login extends Vue {
   private newQuizRoomName = "";
   private quizRoomId = "";
   database: Database | null = null;
-
-  private api = `https://opentdb.com/api.php?amount=10&category=9&type=multiple`;
+  private amount = 10;
 
   created(): void {
     this.database = this.getDatabase(this.username);
@@ -221,8 +254,10 @@ export default class Login extends Vue {
   async generateQuiz(): Promise<Quiz> {
     try {
       const shuffle = () => Math.random() - 0.5;
-      const response = await axios.get(this.api);
-      const category = response.data.results[0]["category"];
+      const api = `https://opentdb.com/api.php?amount=${this.amount}&type=multiple`;
+      const response = await axios.get(api);
+      // const category = response.data.results[0]["category"];
+      const category = "Any";
       const questions: Question[] = response.data.results.map(
         (obj: {
           question: string;

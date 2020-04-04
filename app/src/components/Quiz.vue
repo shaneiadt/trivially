@@ -63,7 +63,7 @@
           <div class="content" ref="answerContainer" v-if="room.quiz.isStarted && !showResults">
             <p class="title is-3">
               {{
-              room.quiz.questions[room.quiz.currentQuestionIndex]["question"]
+              room.quiz.questions[room.quiz.currentQuestionIndex]["question"] | decode
               }}
             </p>
             <p class="subtitle is-5">
@@ -91,7 +91,7 @@
                     :value="index"
                     @click="setAnswer(index)"
                   />
-                  {{ answer }}
+                  {{ answer | decode }}
                 </label>
               </div>
             </div>
@@ -146,6 +146,7 @@ import {
 } from "../interfaces";
 import { Database } from "../types";
 import io from "socket.io-client";
+import he, { decode } from "he";
 
 interface RoomData {
   name: string;
@@ -160,7 +161,13 @@ const HOST = process.env.VUE_APP_HOST
   ? `http://localhost:${process.env.VUE_APP_HOST}`
   : "";
 
-@Component
+@Component({
+  filters: {
+    decode(v: string): string {
+      return he.decode(v);
+    }
+  }
+})
 export default class Quiz extends Vue {
   @Prop() readonly qid!: string;
   @Prop() readonly username!: string;
