@@ -255,7 +255,7 @@ export default class Login extends Vue {
   async generateQuiz(): Promise<Quiz> {
     try {
       const shuffle = () => Math.random() - 0.5;
-      const api = `https://opentdb.com/api.php?amount=${this.amount}&type=multiple&category17&difficulty=easy`;
+      const api = `https://opentdb.com/api.php?amount=${this.amount}&type=multiple&category11&difficulty=easy`;
       const response = await axios.get(api);
       // const category = response.data.results[0]["category"];
       const category = "Any";
