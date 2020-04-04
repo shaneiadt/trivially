@@ -10,18 +10,9 @@
               <div v-for="room in database.rooms" :key="room.id">
                 <h5 class="title is-5">{{ room.name }}</h5>
                 <p class="title is-6">Category: {{ room.quiz.category }}</p>
-                <p class="title is-6">
-                  No. Questions: {{ room.quiz.questions.length }}
-                </p>
-                <button
-                  class="button is-primary is-outlined"
-                  @click="join(room.id)"
-                >
-                  Start</button
-                >&nbsp;
-                <button class="button" @click="removeQuizRoom(room.id)">
-                  Remove
-                </button>
+                <p class="title is-6">No. Questions: {{ room.quiz.questions.length }}</p>
+                <button class="button is-primary is-outlined" @click="join(room.id)">Start</button>&nbsp;
+                <button class="button" @click="removeQuizRoom(room.id)">Remove</button>
                 <br />
                 <br />
               </div>
@@ -32,42 +23,38 @@
       </div>
       <div class="tile is-parent is-9">
         <article class="tile is-child box">
-          <p class="title">Actions</p>
-          <hr />
           <div class="content">
-            <div>
-              <input
-                class="input"
-                type="text"
-                v-model="newQuizRoomName"
-                placeholder="New Quiz Room"
-                @keypress.enter="createDatabase(newQuizRoomName)"
-              />
-              <br />
-              <br />
-              <button
-                class="button is-fullwidth is-primary is-outlined"
-                @click="createDatabase(newQuizRoomName)"
-              >
-                Create
-              </button>
-              <br />
-              <br />
-              <input
-                class="input"
-                type="text"
-                v-model="quizRoomId"
-                placeholder="Enter Quiz Room ID"
-                @keypress.enter="join(quizRoomId)"
-              />
-              <br />
-              <br />
-              <button
-                class="button is-fullwidth is-primary is-outlined"
-                @click="join(quizRoomId)"
-              >
-                Join
-              </button>
+            <div class="columns">
+              <div class="column">
+                <input
+                  class="input"
+                  type="text"
+                  v-model="quizRoomId"
+                  placeholder="Enter Quiz Room ID"
+                  @keypress.enter="join(quizRoomId)"
+                />
+                <br />
+                <br />
+                <button
+                  class="button is-fullwidth is-primary is-outlined"
+                  @click="join(quizRoomId)"
+                >Join</button>
+              </div>
+              <div class="column">
+                <input
+                  class="input"
+                  type="text"
+                  v-model="newQuizRoomName"
+                  placeholder="New Quiz Room"
+                  @keypress.enter="createDatabase(newQuizRoomName)"
+                />
+                <br />
+                <br />
+                <button
+                  class="button is-fullwidth is-primary is-outlined"
+                  @click="createDatabase(newQuizRoomName)"
+                >Create</button>
+              </div>
             </div>
           </div>
         </article>
@@ -233,6 +220,7 @@ export default class Login extends Vue {
 
   async generateQuiz(): Promise<Quiz> {
     try {
+      const shuffle = () => Math.random() - 0.5;
       const response = await axios.get(this.api);
       const category = response.data.results[0]["category"];
       const questions: Question[] = response.data.results.map(
@@ -244,7 +232,7 @@ export default class Login extends Vue {
         }) => ({
           question: obj.question,
           difficulty: obj.difficulty,
-          answers: [...obj.incorrect_answers, obj.correct_answer],
+          answers: [...obj.incorrect_answers, obj.correct_answer].sort(shuffle),
           correctAnswer: obj.correct_answer
         })
       );

@@ -6,7 +6,7 @@
       :username="user.name"
       :join="join"
     />
-    <Quiz v-if="display === 'QUIZ'" :qid="qid" :username="user.name" />
+    <Quiz v-if="display === 'QUIZ'" :qid="qid" :username="user.name" :leave="leave" />
   </div>
 </template>
 
@@ -37,6 +37,11 @@ export default class Home extends Vue {
     console.log("JOIN", roomId);
     this.qid = roomId;
     this.display = Display.QUIZ;
+  }
+  
+  leave(): void {
+    this.qid = "";
+    this.display = Display.ROOMS;
   }
 }
 </script>

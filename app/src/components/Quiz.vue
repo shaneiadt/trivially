@@ -4,26 +4,22 @@
       <div class="tile is-parent">
         <article class="tile is-child box" v-if="room">
           <p class="title">Players</p>
-          <p class="subtitle has-text-weight-light" style="font-size:15px;">
-            {{ room.id }}
-          </p>
+          <p class="subtitle has-text-weight-light" style="font-size:15px;">{{ room.id }}</p>
           <hr />
           <div class="content">
-            <ul>
-              <li v-for="player in room.players" :key="player.name">
+            <p v-for="(player, index) in room.players" :key="index">
+              <span style="width:100%;" class="tag is-primary is-medium is-light">
                 {{ player.name }}
-                <span class="icon" v-if="room.quiz.isStarted">
-                  <i
-                    v-if="
-                      room.players.find(p => p.name === player.name).answers[
-                        room.quiz.currentQuestionIndex
-                      ] !== undefined
-                    "
-                    class="fas fa-lock"
-                  ></i>
+                <span
+                  style="margin-left:5px;"
+                  class="icon"
+                  v-if="room.quiz.isStarted && isPlayerLockedIn(player.name)"
+                >
+                  <i class="fas fa-lock"></i>
                 </span>
-              </li>
-            </ul>
+              </span>
+            </p>
+            <button :class="['button', 'is-primary', 'is-outlined']" @click="leaveRoom">Leave</button>
           </div>
         </article>
       </div>
@@ -32,25 +28,50 @@
           <p class="title">
             {{ room.name
             }}{{
-              room.quiz.isStarted
-                ? ` - Round ${room.quiz.currentQuestionIndex + 1}`
-                : ""
+            room.quiz.isStarted
+            ? ` - Round ${room.quiz.currentQuestionIndex + 1}`
+            : ""
             }}
           </p>
           <p class="subtitle">{{ room.quiz.category }}</p>
           <hr />
-          <div class="content" v-if="room.quiz.isStarted">
+          <div class="content" ref="answerContainer" v-if="showResults">
+            <div class="columns">
+              <div class="column" v-for="(player, index) in room.players" :key="index">
+                <div class="box">
+                  <p class="is-size-5 has-text-weight-semibold">{{ player.name }}</p>
+                  <span class="icon" v-for="index in scores[player.name]" :key="index">
+                    <i class="fas fa-star"></i>
+                  </span>
+                </div>
+              </div>
+            </div>
+            <p class="title">Answers</p>
+            <div
+              class="box"
+              v-for="(question, index) in room.quiz.questions"
+              :key="index + Math.random()"
+            >
+              <p class="has-text-weight-semibold">{{index + 1}}. {{ question.question }}</p>
+              <p
+                :class="[answer === question.correctAnswer ? 'has-text-weight-bold':'has-text-weight-light']"
+                v-for="answer in question.answers"
+                :key="answer"
+              >{{ answer }}</p>
+            </div>
+          </div>
+          <div class="content" ref="answerContainer" v-if="room.quiz.isStarted && !showResults">
             <p class="title is-3">
               {{
-                room.quiz.questions[room.quiz.currentQuestionIndex]["question"]
+              room.quiz.questions[room.quiz.currentQuestionIndex]["question"]
               }}
             </p>
             <p class="subtitle is-5">
               Difficulty:
               {{
-                room.quiz.questions[room.quiz.currentQuestionIndex][
-                  "difficulty"
-                ]
+              room.quiz.questions[room.quiz.currentQuestionIndex][
+              "difficulty"
+              ]
               }}
             </p>
 
@@ -66,6 +87,7 @@
                   <input
                     type="radio"
                     name="answer"
+                    :disabled="lockedIn"
                     :value="index"
                     @click="setAnswer(index)"
                   />
@@ -76,13 +98,11 @@
 
             <button
               :class="['button', 'is-fullwidth', 'is-primary']"
-              :disabled="answerIndex === -1"
+              :disabled="lockedIn"
               @click="lockItIn"
-            >
-              Lock It In!
-            </button>
+            >Lock It In!</button>
           </div>
-          <div class="content" v-else>
+          <div class="content" v-else-if="!room.quiz.isStarted">
             <p class="is-centered">WAITING ON QUIZ TO CLICK START</p>
           </div>
           <div v-if="room.admin.includes(username)">
@@ -90,9 +110,7 @@
               v-if="!room.quiz.isStarted"
               :class="['button', 'is-primary']"
               @click="startQuiz"
-            >
-              Start Quiz
-            </button>
+            >Start Quiz</button>
             <button
               v-if="
                 room.quiz.isStarted &&
@@ -102,9 +120,16 @@
               :class="['button', 'is-primary']"
               @click="nextQuestion"
               :disabled="!room.quiz.isStarted"
-            >
-              Next Question
-            </button>
+            >Next Question</button>
+            <button
+              v-if="
+                room.quiz.isStarted &&
+                  room.quiz.currentQuestionIndex + 1 ===
+                    room.quiz.questions.length && allLockedIn() && !showResults
+              "
+              :class="['button', 'is-primary']"
+              @click="showScores"
+            >Show Scores</button>
           </div>
         </article>
       </div>
@@ -113,10 +138,9 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop } from "vue-property-decorator";
+import { Vue, Component, Prop, Watch, Ref } from "vue-property-decorator";
 import {
   Database as UserDatabase,
-  // Room,
   Quiz as RDQuiz,
   Player
 } from "../interfaces";
@@ -132,18 +156,53 @@ interface RoomData {
   players: Player[];
 }
 
-const HOST = process.env.VUE_APP_HOST ? `http://localhost:${process.env.VUE_APP_HOST}`  : "";
+const HOST = process.env.VUE_APP_HOST
+  ? `http://localhost:${process.env.VUE_APP_HOST}`
+  : "";
 
 @Component
 export default class Quiz extends Vue {
   @Prop() readonly qid!: string;
   @Prop() readonly username!: string;
+  @Prop() readonly leave!: () => void;
+  @Ref() readonly answerContainer!: HTMLDivElement;
 
   database: Database = new Database("trivially");
   userDb: UserDatabase | null = null;
   room: RoomData | null = null;
   socket: SocketIOClient.Socket = io(HOST);
   answerIndex = -1;
+  lockedIn = false;
+  showResults = false;
+  scores: { [key: string]: number } = {};
+
+  @Watch("room", { deep: true })
+  roomChanged(): void {
+    if (this.room) {
+      console.log("ROOM CHANGED");
+      console.log(this.room);
+      const player = this.room.players.find(p => p.name === this.username);
+
+      if (player) {
+        const result =
+          player.answers[this.room.quiz.currentQuestionIndex] === undefined;
+
+        if (result) {
+          const div = this.$refs.answerContainer as HTMLDivElement;
+
+          if (div) {
+            div.querySelectorAll(".box input").forEach((el: Element): void => {
+              const radio = el as HTMLInputElement;
+              radio.checked = false;
+            });
+
+            this.lockedIn = false;
+            this.answerIndex = -1;
+          }
+        }
+      }
+    }
+  }
 
   mounted(): void {
     this.socket.emit(
@@ -174,9 +233,43 @@ export default class Quiz extends Vue {
       }
     );
 
+    this.socket.on("score", () => {
+      console.log("CALCULATE SHOWS & SHOW ANSWERS");
+
+      if (this.room) {
+        // console.log(this.room);
+        const { players, quiz } = this.room;
+
+        if (players && quiz) {
+          const scores: { [key: string]: number } = {};
+
+          quiz.questions.forEach((question, i) => {
+            players.forEach(({ answers, score, name }) => {
+              console.log({ question });
+              console.log(name);
+              console.log(question.answers[answers[i]]);
+              console.log(question.correctAnswer);
+
+              if (!scores[name]) {
+                scores[name] = 0;
+              }
+
+              if (question.answers[answers[i]] === question.correctAnswer) {
+                scores[name] = scores[name] + 1;
+              }
+            });
+
+            this.scores = scores;
+          });
+
+          console.log({ scores, players });
+        }
+
+        this.showResults = true;
+      }
+    });
+
     this.socket.on("roomData", (roomData: RoomData) => {
-      console.log("UPDATE ROOM DATA");
-      console.log({ roomData });
       this.room = roomData;
     });
   }
@@ -185,24 +278,63 @@ export default class Quiz extends Vue {
     this.answerIndex = index;
   }
 
-  lockItIn(): void {
-    console.log("LOCKING IT IN");
-    console.log({ index: this.answerIndex });
+  isPlayerLockedIn(uname: string): boolean {
+    if (this.room) {
+      const player = this.room.players.find(p => p.name === uname);
 
+      if (player) {
+        const result =
+          player.answers[this.room.quiz.currentQuestionIndex] !== undefined;
+
+        return result;
+      }
+    }
+
+    return false;
+  }
+
+  allLockedIn(): boolean {
+    // console.log("ALL LOCKED IN");
+
+    if (this.room) {
+      const room = this.room;
+      const filter = room.players.filter(
+        player => player.answers.length === room.quiz.questions.length
+      );
+
+      // console.log({ filter });
+
+      return filter.length > 0 ? true : false;
+    }
+
+    return false;
+  }
+
+  leaveRoom(): void {
+    if (this.room) {
+      const player = this.room.players.find(p => p.name === this.username);
+
+      if (player) {
+        this.socket.emit("leaveRoom", { id: player.socketId });
+        this.leave();
+      }
+    }
+  }
+
+  lockItIn(): void {
     this.socket.emit("lockInAnswer", {
       id: this.qid,
       username: this.username,
       answerIndex: this.answerIndex
     });
+
+    this.lockedIn = true;
   }
 
   isLockedIn(uname: string): boolean {
-    console.log("IsLocked In");
     if (this.room) {
-      console.log(this.room);
       const player = this.room.players.find(player => player.name === uname);
 
-      console.log(player);
       if (player) {
         return player.answers[this.room.quiz.currentQuestionIndex]
           ? true
@@ -213,15 +345,15 @@ export default class Quiz extends Vue {
     return false;
   }
 
-  startQuiz(): void {
-    console.log("START QUIZ");
+  showScores(): void {
+    this.socket.emit("showScores", { id: this.qid });
+  }
 
+  startQuiz(): void {
     this.socket.emit("startQuiz", { id: this.qid });
   }
 
   nextQuestion(): void {
-    console.log("NEXT QUESTION");
-
     this.socket.emit("nextQuestion", { id: this.qid });
   }
 }

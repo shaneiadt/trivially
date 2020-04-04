@@ -23,10 +23,7 @@ const newQuiz = (newQuizObj) => {
 };
 
 const lockInAnswer = (id, username, answerIndex) => {
-  console.log('HERE');
-  console.log({id, username, answerIndex});
   const room = getQuizById(id);
-  console.log({room});
 
   if (room) {
     const player = room.players.find(player => player.name === username);
