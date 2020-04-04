@@ -65,9 +65,6 @@
                   <div class="column">
                     <input class="input" type="text" v-model="amount" />
                   </div>
-                  <div class="column">
-                    <input class="input" type="text" v-model="categoryNumber" />
-                  </div>
                 </div>
                 <button
                   class="button is-fullwidth is-primary is-outlined"
