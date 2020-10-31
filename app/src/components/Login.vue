@@ -3,7 +3,7 @@
     <div class="columns is-centered is-vcentered" style="height:100vh;">
       <div class="column is-one-third">
         <div class="box">
-          <h1 class="title has-text-centered">Trivially</h1>
+          <h1 class="title has-text-centered logo">Trivially</h1>
           <h2 class="subtitle has-text-centered">Be Socially Isolated</h2>
           <div class="field has-addons">
             <div class="control is-expanded">
@@ -49,3 +49,14 @@ export default class Login extends Vue {
   }
 }
 </script>
+
+<style>
+.logo {
+  text-transform: uppercase;
+	background: linear-gradient(to right, #30CFD0 0%, #330867 100%);
+	background-clip: text;
+	-webkit-background-clip: text;
+	-webkit-text-fill-color: transparent;
+  font-size: 3em;
+}
+</style>
