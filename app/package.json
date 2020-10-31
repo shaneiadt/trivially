@@ -10,22 +10,22 @@
   "dependencies": {
     "@types/he": "^1.1.1",
     "axios": "^0.19.2",
-    "core-js": "^3.6.4",
+    "core-js": "^3.6.5",
     "he": "^1.2.0",
-    "socket.io-client": "^2.3.0",
-    "uuid": "^7.0.2",
-    "vue": "^2.6.11",
-    "vue-class-component": "^7.2.2",
-    "vue-property-decorator": "^8.4.1",
-    "vue-router": "^3.1.5",
-    "vuex": "^3.1.2"
+    "socket.io-client": "^2.3.1",
+    "uuid": "^7.0.3",
+    "vue": "^2.6.12",
+    "vue-class-component": "^7.2.6",
+    "vue-property-decorator": "^8.5.1",
+    "vue-router": "^3.4.8",
+    "vuex": "^3.5.1"
   },
   "devDependencies": {
-    "@types/node": "^13.11.0",
-    "@types/socket.io-client": "^1.4.32",
-    "@types/uuid": "^7.0.2",
-    "@typescript-eslint/eslint-plugin": "^2.18.0",
-    "@typescript-eslint/parser": "^2.18.0",
+    "@types/node": "^13.13.30",
+    "@types/socket.io-client": "^1.4.34",
+    "@types/uuid": "^7.0.4",
+    "@typescript-eslint/eslint-plugin": "^2.34.0",
+    "@typescript-eslint/parser": "^2.34.0",
     "@vue/cli-plugin-babel": "~4.2.0",
     "@vue/cli-plugin-eslint": "~4.2.0",
     "@vue/cli-plugin-router": "~4.2.0",
@@ -33,12 +33,12 @@
     "@vue/cli-plugin-vuex": "~4.2.0",
     "@vue/cli-service": "~4.2.0",
     "@vue/eslint-config-prettier": "^6.0.0",
-    "@vue/eslint-config-typescript": "^5.0.1",
+    "@vue/eslint-config-typescript": "^5.1.0",
     "eslint": "^6.7.2",
-    "eslint-plugin-prettier": "^3.1.1",
+    "eslint-plugin-prettier": "^3.1.4",
     "eslint-plugin-vue": "^6.1.2",
     "prettier": "^1.19.1",
     "typescript": "~3.7.5",
-    "vue-template-compiler": "^2.6.11"
+    "vue-template-compiler": "^2.6.12"
   }
 }
